@@ -1,6 +1,7 @@
-// Advanced Features for Silk Road Global Website
+// Advanced Features for Silk Road Global Website - Dark Theme
+// Enhanced with Apple-style design principles
 
-// 1. Advanced Particle System for Hero Section
+// 1. Advanced Particle System for Hero Section with Dark Theme
 class ParticleSystem {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
@@ -35,18 +36,24 @@ class ParticleSystem {
     }
 
     createParticles() {
-        const particleCount = Math.floor((this.canvas.width * this.canvas.height) / 10000);
+        const particleCount = Math.floor((this.canvas.width * this.canvas.height) / 8000);
         
         for (let i = 0; i < particleCount; i++) {
             this.particles.push({
                 x: Math.random() * this.canvas.width,
                 y: Math.random() * this.canvas.height,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: (Math.random() - 0.5) * 0.5,
-                size: Math.random() * 2 + 1,
-                opacity: Math.random() * 0.5 + 0.2
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                size: Math.random() * 1.5 + 0.5,
+                opacity: Math.random() * 0.3 + 0.1,
+                color: this.getParticleColor()
             });
         }
+    }
+
+    getParticleColor() {
+        const colors = ['247, 147, 30', '255, 169, 64', '255, 255, 255'];
+        return colors[Math.floor(Math.random() * colors.length)];
     }
 
     bindEvents() {
@@ -67,37 +74,48 @@ class ParticleSystem {
             particle.x += particle.vx;
             particle.y += particle.vy;
             
-            // Mouse interaction
+            // Mouse interaction with reduced effect for elegance
             const dx = this.mouse.x - particle.x;
             const dy = this.mouse.y - particle.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            if (distance < 100) {
-                particle.x -= dx * 0.01;
-                particle.y -= dy * 0.01;
+            if (distance < 120) {
+                const force = (120 - distance) / 120;
+                particle.x -= dx * force * 0.005;
+                particle.y -= dy * force * 0.005;
             }
             
             // Boundary check
             if (particle.x < 0 || particle.x > this.canvas.width) particle.vx *= -1;
             if (particle.y < 0 || particle.y > this.canvas.height) particle.vy *= -1;
             
-            // Draw particle
+            // Draw particle with glow effect
             this.ctx.beginPath();
             this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-            this.ctx.fillStyle = `rgba(212, 175, 55, ${particle.opacity})`;
+            
+            // Create gradient for glow effect
+            const gradient = this.ctx.createRadialGradient(
+                particle.x, particle.y, 0,
+                particle.x, particle.y, particle.size * 3
+            );
+            gradient.addColorStop(0, `rgba(${particle.color}, ${particle.opacity})`);
+            gradient.addColorStop(1, `rgba(${particle.color}, 0)`);
+            
+            this.ctx.fillStyle = gradient;
             this.ctx.fill();
             
-            // Connect nearby particles
+            // Connect nearby particles with subtle lines
             this.particles.slice(index + 1).forEach(otherParticle => {
                 const dx = particle.x - otherParticle.x;
                 const dy = particle.y - otherParticle.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                if (distance < 80) {
+                if (distance < 100) {
                     this.ctx.beginPath();
                     this.ctx.moveTo(particle.x, particle.y);
                     this.ctx.lineTo(otherParticle.x, otherParticle.y);
-                    this.ctx.strokeStyle = `rgba(212, 175, 55, ${0.2 * (1 - distance / 80)})`;
+                    const opacity = (1 - distance / 100) * 0.1;
+                    this.ctx.strokeStyle = `rgba(247, 147, 30, ${opacity})`;
                     this.ctx.lineWidth = 0.5;
                     this.ctx.stroke();
                 }
@@ -108,7 +126,7 @@ class ParticleSystem {
     }
 }
 
-// 2. Advanced Scroll Animations with GSAP-like functionality
+// 2. Apple-inspired Scroll Animations
 class ScrollAnimations {
     constructor() {
         this.elements = [];
@@ -121,13 +139,13 @@ class ScrollAnimations {
     }
 
     bindElements() {
-        // Define animation configurations
+        // Define animation configurations with Apple-style easing
         const configs = [
-            { selector: '.section-title', animation: 'slideUp', delay: 0 },
-            { selector: '.business-card', animation: 'slideUp', delay: 0.1, stagger: 0.1 },
-            { selector: '.brand-card', animation: 'slideUp', delay: 0.1, stagger: 0.1 },
-            { selector: '.feature-item', animation: 'slideLeft', delay: 0.2, stagger: 0.1 },
-            { selector: '.location-card', animation: 'scale', delay: 0.1, stagger: 0.05 }
+            { selector: '.section-title', animation: 'slideUp', delay: 0, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' },
+            { selector: '.business-card', animation: 'slideUp', delay: 0.1, stagger: 0.08 },
+            { selector: '.brand-card', animation: 'slideUp', delay: 0.1, stagger: 0.06 },
+            { selector: '.feature-item', animation: 'slideLeft', delay: 0.15, stagger: 0.08 },
+            { selector: '.location-card', animation: 'scale', delay: 0.1, stagger: 0.04 }
         ];
 
         configs.forEach(config => {
@@ -137,6 +155,7 @@ class ScrollAnimations {
                     element,
                     animation: config.animation,
                     delay: config.delay + (config.stagger || 0) * index,
+                    easing: config.easing || 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                     triggered: false
                 });
             });
@@ -154,7 +173,10 @@ class ScrollAnimations {
                     }
                 }
             });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        }, { 
+            threshold: 0.1, 
+            rootMargin: '0px 0px -80px 0px' 
+        });
 
         this.elements.forEach(({ element }) => {
             observer.observe(element);
@@ -162,9 +184,10 @@ class ScrollAnimations {
     }
 
     triggerAnimation(elementData) {
-        const { element, animation, delay } = elementData;
+        const { element, animation, delay, easing } = elementData;
         
         setTimeout(() => {
+            element.style.transition = `all 0.8s ${easing}`;
             element.classList.add('animate-in');
             
             switch (animation) {
@@ -197,7 +220,7 @@ class ScrollAnimations {
     }
 }
 
-// 3. Dynamic Brand Showcase with 3D Effects
+// 3. Dark Theme Brand Showcase with 3D Effects
 class BrandShowcase {
     constructor() {
         this.currentIndex = 0;
@@ -216,7 +239,7 @@ class BrandShowcase {
         const brandContainer = document.querySelector('.brands-grid');
         if (!brandContainer) return;
 
-        // Add 3D container
+        // Add 3D container with dark theme
         const showcase = document.createElement('div');
         showcase.className = 'brand-showcase-3d';
         showcase.innerHTML = `
@@ -347,7 +370,7 @@ class BrandShowcase {
 
         setTimeout(() => {
             this.isAnimating = false;
-        }, 500);
+        }, 600);
     }
 
     startAutoRotate() {
@@ -355,35 +378,39 @@ class BrandShowcase {
             if (!this.isAnimating) {
                 this.nextSlide();
             }
-        }, 5000);
+        }, 6000);
     }
 
     addShowcaseStyles() {
         const styles = `
             .brand-showcase-3d {
                 margin: 4rem 0;
-                perspective: 1000px;
+                perspective: 1200px;
             }
 
             .showcase-container {
                 position: relative;
-                max-width: 800px;
+                max-width: 900px;
                 margin: 0 auto;
                 overflow: hidden;
-                border-radius: 20px;
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                border-radius: 24px;
+                background: rgba(26, 26, 26, 0.8);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             }
 
             .showcase-track {
                 display: flex;
-                transition: transform 0.5s ease-in-out;
-                height: 300px;
+                transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                height: 320px;
             }
 
             .showcase-card {
                 min-width: 100%;
-                padding: 2rem;
-                background: linear-gradient(135deg, var(--primary-gold), var(--dark-gold));
+                padding: 3rem;
+                background: linear-gradient(135deg, #F7931E, #E8830C);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -391,11 +418,11 @@ class BrandShowcase {
             }
 
             .card-inner {
-                width: 250px;
-                height: 200px;
+                width: 280px;
+                height: 220px;
                 position: relative;
                 transform-style: preserve-3d;
-                transition: transform 0.6s;
+                transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             }
 
             .showcase-card:hover .card-inner {
@@ -407,31 +434,36 @@ class BrandShowcase {
                 width: 100%;
                 height: 100%;
                 backface-visibility: hidden;
-                border-radius: 15px;
+                border-radius: 20px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 text-align: center;
                 color: white;
+                font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
             }
 
             .card-back {
                 transform: rotateY(180deg);
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(10px);
+                background: rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(15px);
+                -webkit-backdrop-filter: blur(15px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
             }
 
             .brand-logo {
-                width: 60px;
-                height: 60px;
-                background: rgba(255, 255, 255, 0.2);
+                width: 70px;
+                height: 70px;
+                background: rgba(255, 255, 255, 0.15);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin-bottom: 1rem;
-                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+                font-size: 1.8rem;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
             }
 
             .showcase-controls {
@@ -441,64 +473,84 @@ class BrandShowcase {
                 width: 100%;
                 display: flex;
                 justify-content: space-between;
-                padding: 0 1rem;
+                padding: 0 1.5rem;
                 pointer-events: none;
             }
 
             .showcase-btn {
                 pointer-events: auto;
-                background: rgba(255, 255, 255, 0.2);
+                background: rgba(0, 0, 0, 0.4);
                 border: none;
                 width: 50px;
                 height: 50px;
                 border-radius: 50%;
                 color: white;
                 cursor: pointer;
-                transition: all 0.3s ease;
-                backdrop-filter: blur(10px);
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                backdrop-filter: blur(15px);
+                -webkit-backdrop-filter: blur(15px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
             }
 
             .showcase-btn:hover {
-                background: rgba(255, 255, 255, 0.3);
+                background: rgba(247, 147, 30, 0.6);
                 transform: scale(1.1);
+                box-shadow: 0 4px 20px rgba(247, 147, 30, 0.3);
             }
 
             .showcase-indicators {
                 display: flex;
                 justify-content: center;
-                gap: 0.5rem;
-                margin-top: 1rem;
+                gap: 0.8rem;
+                margin-top: 1.5rem;
             }
 
             .indicator {
-                width: 12px;
-                height: 12px;
+                width: 8px;
+                height: 8px;
                 border-radius: 50%;
-                background: rgba(212, 175, 55, 0.3);
+                background: rgba(255, 255, 255, 0.3);
                 cursor: pointer;
-                transition: all 0.3s ease;
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             }
 
             .indicator.active {
-                background: var(--primary-gold);
-                transform: scale(1.2);
+                background: #F7931E;
+                transform: scale(1.4);
+                box-shadow: 0 0 12px rgba(247, 147, 30, 0.6);
             }
 
             .learn-more-btn {
-                background: white;
-                color: var(--primary-gold);
+                background: rgba(255, 255, 255, 0.9);
+                color: #F7931E;
                 border: none;
-                padding: 0.5rem 1rem;
-                border-radius: 20px;
+                padding: 0.8rem 1.5rem;
+                border-radius: 25px;
                 cursor: pointer;
                 font-weight: 600;
                 margin-top: 1rem;
-                transition: all 0.3s ease;
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
             }
 
             .learn-more-btn:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+                background: white;
+            }
+
+            .card-back p {
+                font-size: 0.95rem;
+                line-height: 1.5;
+                margin-bottom: 1rem;
+                opacity: 0.9;
+            }
+
+            .card-front h3 {
+                font-size: 1.4rem;
+                font-weight: 600;
+                margin-top: 0.5rem;
             }
         `;
 
@@ -508,7 +560,7 @@ class BrandShowcase {
     }
 }
 
-// 4. Advanced Form Validation with Real-time Feedback
+// 4. Enhanced Form Validation with Dark Theme
 class AdvancedFormValidation {
     constructor(formId) {
         this.form = document.getElementById(formId);
@@ -608,7 +660,7 @@ class AdvancedFormValidation {
         clearTimeout(field.timeout);
         field.timeout = setTimeout(() => {
             this.validateField(field);
-        }, 300);
+        }, 400);
     }
 
     showFieldFeedback(field, isValid, errors) {
@@ -666,33 +718,34 @@ class AdvancedFormValidation {
             .form-group input.valid,
             .form-group select.valid,
             .form-group textarea.valid {
-                border-bottom-color: #28a745 !important;
+                border-bottom-color: #F7931E !important;
             }
 
             .form-group input.invalid,
             .form-group select.invalid,
             .form-group textarea.invalid {
-                border-bottom-color: #dc3545 !important;
+                border-bottom-color: #FF453A !important;
             }
 
             .field-feedback {
                 position: absolute;
-                bottom: -25px;
+                bottom: -28px;
                 left: 0;
                 font-size: 0.8rem;
-                animation: slideInUp 0.3s ease;
+                animation: slideInUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
             }
 
             .field-feedback.error {
-                color: #dc3545;
+                color: #FF453A;
             }
 
             .field-feedback.success {
-                color: #28a745;
+                color: #F7931E;
             }
 
             .field-feedback i {
-                margin-right: 0.3rem;
+                margin-right: 0.4rem;
             }
         `;
 
@@ -702,7 +755,7 @@ class AdvancedFormValidation {
     }
 }
 
-// 5. Loading States and Micro-interactions
+// 5. Apple-inspired Micro-interactions
 class MicroInteractions {
     constructor() {
         this.init();
@@ -713,6 +766,7 @@ class MicroInteractions {
         this.addCardHoverEffects();
         this.addNavigationEffects();
         this.addScrollIndicator();
+        this.addAppleStyleHaptics();
     }
 
     addButtonRippleEffect() {
@@ -733,11 +787,11 @@ class MicroInteractions {
                 
                 button.appendChild(ripple);
                 
-                setTimeout(() => ripple.remove(), 600);
+                setTimeout(() => ripple.remove(), 800);
             });
         });
 
-        // Add ripple styles
+        // Add ripple styles with dark theme
         const rippleStyles = `
             button, .btn-primary, .btn-secondary {
                 position: relative;
@@ -747,9 +801,9 @@ class MicroInteractions {
             .ripple {
                 position: absolute;
                 border-radius: 50%;
-                background: rgba(255, 255, 255, 0.6);
+                background: rgba(255, 255, 255, 0.4);
                 transform: scale(0);
-                animation: rippleEffect 0.6s linear;
+                animation: rippleEffect 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                 pointer-events: none;
             }
 
@@ -778,10 +832,14 @@ class MicroInteractions {
                 card.style.setProperty('--mouse-x', x + 'px');
                 card.style.setProperty('--mouse-y', y + 'px');
                 card.classList.add('hovered');
+                
+                // Add subtle glow effect
+                card.style.boxShadow = '0 20px 40px rgba(247, 147, 30, 0.2)';
             });
             
             card.addEventListener('mouseleave', () => {
                 card.classList.remove('hovered');
+                card.style.boxShadow = '';
             });
             
             card.addEventListener('mousemove', (e) => {
@@ -805,6 +863,7 @@ class MicroInteractions {
             
             link.addEventListener('mouseenter', () => {
                 underline.style.width = '100%';
+                underline.style.background = '#F7931E';
             });
             
             link.addEventListener('mouseleave', () => {
@@ -824,16 +883,17 @@ class MicroInteractions {
             indicator.style.width = scrollPercent + '%';
         });
 
-        // Add scroll indicator styles
+        // Add scroll indicator styles with dark theme
         const indicatorStyles = `
             .scroll-indicator-bar {
                 position: fixed;
                 top: 0;
                 left: 0;
-                height: 4px;
-                background: var(--gradient-primary);
+                height: 3px;
+                background: linear-gradient(90deg, #F7931E, #FFA940);
                 z-index: 9999;
-                transition: width 0.1s ease;
+                transition: width 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                box-shadow: 0 0 10px rgba(247, 147, 30, 0.5);
             }
         `;
 
@@ -841,15 +901,35 @@ class MicroInteractions {
         styleSheet.textContent = indicatorStyles;
         document.head.appendChild(styleSheet);
     }
+
+    addAppleStyleHaptics() {
+        // Add subtle scale animations on touch/click for better feedback
+        const interactiveElements = document.querySelectorAll('button, .brand-card, .business-card, .nav-link');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('mousedown', () => {
+                element.style.transform = 'scale(0.98)';
+                element.style.transition = 'transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            });
+            
+            element.addEventListener('mouseup', () => {
+                element.style.transform = 'scale(1)';
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                element.style.transform = 'scale(1)';
+            });
+        });
+    }
 }
 
-// Initialize all advanced features
+// Initialize all advanced features with dark theme
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize particle system for hero section
     if (document.querySelector('.hero')) {
         setTimeout(() => {
             new ParticleSystem('home');
-        }, 1000);
+        }, 1200);
     }
     
     // Initialize advanced scroll animations
@@ -864,7 +944,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize micro-interactions
     new MicroInteractions();
     
-    console.log('🚀 All advanced features initialized successfully!');
+    console.log('🚀 All advanced features initialized with dark theme and Apple-style design!');
 });
 
 // Performance monitoring for advanced features
@@ -885,8 +965,24 @@ const performanceMonitor = {
             console.log(`${name} took ${(end - start).toFixed(2)}ms`);
             return result;
         };
+    },
+    
+    // Monitor dark theme performance
+    monitorThemePerformance() {
+        const observer = new PerformanceObserver((list) => {
+            list.getEntries().forEach((entry) => {
+                if (entry.name.includes('dark') || entry.name.includes('theme')) {
+                    console.log(`Theme-related performance: ${entry.name} - ${entry.duration}ms`);
+                }
+            });
+        });
+        
+        observer.observe({ entryTypes: ['measure', 'navigation'] });
     }
 };
+
+// Initialize performance monitoring
+performanceMonitor.monitorThemePerformance();
 
 // Export for global access
 window.AdvancedFeatures = {
@@ -897,3 +993,19 @@ window.AdvancedFeatures = {
     MicroInteractions,
     performanceMonitor
 };
+
+// Apple-style system detection
+window.detectAppleDevice = function() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isAppleDevice = /iPad|iPhone|iPod|Mac/.test(userAgent);
+    
+    if (isAppleDevice) {
+        document.body.classList.add('apple-device');
+        console.log('🍎 Apple device detected - enhanced animations enabled');
+    }
+    
+    return isAppleDevice;
+};
+
+// Initialize Apple device detection
+window.detectAppleDevice();

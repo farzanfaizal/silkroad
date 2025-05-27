@@ -136,20 +136,30 @@ const SiteConfig = {
     features: {
         advancedAnimations: true,
         particleSystem: true,
-        darkMode: false,
+        darkMode: true, // Enable dark mode
         multiLanguage: false,
         productCatalog: false,
         onlineOrdering: false
     },
 
-    // Theme Configuration
+    // Dark Theme Configuration
     theme: {
-        primaryColor: '#D4AF37',
-        secondaryColor: '#1B2951',
-        accentColor: '#F4E5B8',
+        mode: 'dark',
+        colors: {
+            primary: '#F7931E',
+            secondary: '#E8830C',
+            accent: '#FFA940',
+            background: '#000000',
+            surface: '#111111',
+            card: '#1a1a1a',
+            text: '#FFFFFF',
+            textSecondary: '#B3B3B3',
+            border: '#404040'
+        },
         fonts: {
-            heading: 'Playfair Display',
-            body: 'Inter'
+            primary: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif',
+            heading: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif',
+            body: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif'
         }
     }
 };
@@ -162,7 +172,28 @@ const SiteUtils = {
         this.setupChat();
         this.setupSEO();
         this.setupServiceWorker();
-        console.log('🚀 Site utilities initialized');
+        this.applyDarkTheme(); // Apply dark theme
+        console.log('🚀 Site utilities initialized with dark theme');
+    },
+
+    // Apply Dark Theme
+    applyDarkTheme() {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.body.classList.add('dark-theme');
+        
+        // Set meta theme color for mobile browsers
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', SiteConfig.theme.colors.background);
+        }
+        
+        // Set color scheme preference
+        const metaColorScheme = document.querySelector('meta[name="color-scheme"]');
+        if (metaColorScheme) {
+            metaColorScheme.setAttribute('content', 'dark');
+        }
+        
+        console.log('🌙 Dark theme applied successfully');
     },
 
     // Analytics Setup
@@ -271,7 +302,7 @@ const SiteUtils = {
 
         document.body.appendChild(whatsappBtn);
 
-        // Add WhatsApp button styles
+        // Add WhatsApp button styles with dark theme
         const styles = `
             .whatsapp-floating-btn {
                 position: fixed;
@@ -300,13 +331,19 @@ const SiteUtils = {
                 transform: scale(1.1);
                 box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
             }
+
+            @media (prefers-color-scheme: dark) {
+                .whatsapp-floating-btn a {
+                    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.6);
+                }
+            }
         `;
 
         const styleSheet = document.createElement('style');
         styleSheet.textContent = styles;
         document.head.appendChild(styleSheet);
         
-        console.log('✅ WhatsApp chat loaded');
+        console.log('✅ WhatsApp chat loaded with dark theme support');
     },
 
     setupTawkChat() {
@@ -356,7 +393,11 @@ const SiteUtils = {
         this.setMetaTag('twitter:card', config.twitter.card, 'name');
         this.setMetaTag('twitter:site', config.twitter.site, 'name');
         
-        console.log('✅ SEO meta tags updated');
+        // Dark theme specific meta tags
+        this.setMetaTag('color-scheme', 'dark', 'name');
+        this.setMetaTag('theme-color', SiteConfig.theme.colors.background, 'name');
+        
+        console.log('✅ SEO meta tags updated with dark theme support');
     },
 
     setMetaTag(name, content, attribute = 'name') {
@@ -528,25 +569,59 @@ const SiteUtils = {
 
     // Theme utilities
     toggleDarkMode() {
-        if (!SiteConfig.features.darkMode) return;
-        
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        // Dark mode is always enabled in this configuration
+        console.log('Dark mode is permanently enabled');
     },
 
     initializeDarkMode() {
-        if (!SiteConfig.features.darkMode) return;
+        // Dark mode is always enabled
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'true');
+        console.log('🌙 Dark mode initialized');
+    },
+
+    // Apple-style system font detection
+    detectSystemFonts() {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
         
-        const isDarkMode = localStorage.getItem('darkMode') === 'true';
-        if (isDarkMode) {
-            document.body.classList.add('dark-mode');
+        // Test for San Francisco font availability
+        context.font = '12px SF Pro Display';
+        const sfWidth = context.measureText('test').width;
+        
+        context.font = '12px Arial';
+        const arialWidth = context.measureText('test').width;
+        
+        const hasSanFrancisco = sfWidth !== arialWidth;
+        
+        if (hasSanFrancisco) {
+            console.log('✅ San Francisco font detected');
+        } else {
+            console.log('ℹ️ Using system font fallbacks');
         }
+        
+        return hasSanFrancisco;
+    },
+
+    // Dynamic CSS custom properties for theme
+    applyDynamicTheme() {
+        const root = document.documentElement;
+        const colors = SiteConfig.theme.colors;
+        
+        root.style.setProperty('--dynamic-primary', colors.primary);
+        root.style.setProperty('--dynamic-bg', colors.background);
+        root.style.setProperty('--dynamic-surface', colors.surface);
+        root.style.setProperty('--dynamic-text', colors.text);
+        
+        console.log('🎨 Dynamic theme properties applied');
     }
 };
 
 // Initialize utilities when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     SiteUtils.init();
+    SiteUtils.detectSystemFonts();
+    SiteUtils.applyDynamicTheme();
 });
 
 // Export configuration and utilities
@@ -554,7 +629,7 @@ window.SiteConfig = SiteConfig;
 window.SiteUtils = SiteUtils;
 
 // Development helpers
-if (process?.env?.NODE_ENV === 'development') {
+if (typeof process !== 'undefined' && process?.env?.NODE_ENV === 'development') {
     window.debugConfig = () => {
         console.table(SiteConfig);
     };
@@ -562,5 +637,9 @@ if (process?.env?.NODE_ENV === 'development') {
     window.testFeature = (featureName) => {
         console.log(`Testing feature: ${featureName}`);
         console.log(`Enabled: ${SiteConfig.features[featureName]}`);
+    };
+    
+    window.toggleTheme = () => {
+        console.log('Theme is permanently set to dark mode');
     };
 }

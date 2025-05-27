@@ -3,7 +3,7 @@ let isLoading = true;
 let animatedElements = new Set();
 let currentScrollY = 0;
 
-// Brand Data
+// Brand Data with Dark Theme Support
 const brandData = {
     adam: {
         title: "Adam Fragrances",
@@ -61,8 +61,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeWebsite();
 });
 
-// Website Initialization
+// Website Initialization with Dark Theme
 function initializeWebsite() {
+    // Apply dark theme immediately
+    applyDarkTheme();
+    
     // Start loading sequence
     setTimeout(() => {
         hideLoadingScreen();
@@ -76,12 +79,46 @@ function initializeWebsite() {
     initializeBrandModals();
     initializeParallaxEffects();
     initializeSmoothScrolling();
+    initializeAppleStyleElements();
     
     // Add scroll event listener
     window.addEventListener('scroll', handleScroll);
     
     // Add resize event listener
     window.addEventListener('resize', handleResize);
+    
+    console.log('🌙 Dark theme website initialized successfully');
+}
+
+// Dark Theme Application
+function applyDarkTheme() {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.body.classList.add('dark-theme');
+    
+    // Set system color preferences
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#000000');
+    }
+    
+    // Apply Apple system font stack
+    document.body.style.fontFamily = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif';
+}
+
+// Apple-style Elements Initialization
+function initializeAppleStyleElements() {
+    // Add glass morphism effects
+    const glassElements = document.querySelectorAll('.navbar, .contact-form, .modal-content');
+    glassElements.forEach(element => {
+        element.style.backdropFilter = 'blur(20px)';
+        element.style.webkitBackdropFilter = 'blur(20px)';
+    });
+    
+    // Add subtle animations to interactive elements
+    const interactiveElements = document.querySelectorAll('button, .brand-card, .business-card');
+    interactiveElements.forEach(element => {
+        element.style.transition = 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    });
 }
 
 // Loading Screen Functions
@@ -98,12 +135,13 @@ function hideLoadingScreen() {
 }
 
 function triggerEntranceAnimations() {
-    // Animate hero elements
+    // Animate hero elements with Apple-style easing
     const heroElements = document.querySelectorAll('.hero .title-line, .hero-subtitle, .hero-buttons, .hero-stats');
     heroElements.forEach((element, index) => {
         setTimeout(() => {
             element.style.opacity = '1';
             element.style.transform = 'translateY(0)';
+            element.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         }, index * 200);
     });
 }
@@ -114,10 +152,15 @@ function initializeNavigation() {
     const navMenu = document.getElementById('nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
     
-    // Mobile menu toggle
+    // Mobile menu toggle with enhanced animation
     navToggle.addEventListener('click', () => {
         navToggle.classList.toggle('active');
         navMenu.classList.toggle('active');
+        
+        // Add haptic feedback simulation
+        if (navigator.vibrate) {
+            navigator.vibrate(10);
+        }
     });
     
     // Close mobile menu when clicking nav links
@@ -158,7 +201,7 @@ function updateActiveNavLink() {
     });
 }
 
-// Scroll Animations
+// Enhanced Scroll Animations
 function initializeScrollAnimations() {
     const animateOnScrollElements = document.querySelectorAll(`
         .section-title,
@@ -178,13 +221,15 @@ function initializeScrollAnimations() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && !animatedElements.has(entry.target)) {
+                // Apply Apple-style animation
+                entry.target.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                 entry.target.style.animationPlayState = 'running';
                 animatedElements.add(entry.target);
             }
         });
     }, {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '0px 0px -80px 0px'
     });
     
     animateOnScrollElements.forEach(element => {
@@ -192,7 +237,7 @@ function initializeScrollAnimations() {
     });
 }
 
-// Counter Animation
+// Counter Animation with Enhanced Easing
 function initializeCounters() {
     const counters = document.querySelectorAll('.stat-number');
     
@@ -215,27 +260,37 @@ function initializeCounters() {
 function animateCounter(element) {
     const target = parseInt(element.getAttribute('data-target'));
     const duration = 2000; // 2 seconds
-    const increment = target / (duration / 16); // 60 FPS
-    let current = 0;
+    const startTime = performance.now();
     
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-            element.textContent = target + (target === 1000 ? '+' : '');
-            clearInterval(timer);
-        } else {
-            element.textContent = Math.floor(current) + (target === 1000 ? '+' : '');
+    function updateCounter(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Apple-style easing function
+        const easeOutExpo = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        const current = Math.floor(target * easeOutExpo);
+        
+        element.textContent = current + (target === 1000 ? '+' : '');
+        
+        if (progress < 1) {
+            requestAnimationFrame(updateCounter);
         }
-    }, 16);
+    }
+    
+    requestAnimationFrame(updateCounter);
 }
 
-// Contact Form Functions
+// Enhanced Contact Form Functions
 function initializeContactForm() {
     const form = document.getElementById('contactForm');
     const inputs = form.querySelectorAll('input, select, textarea');
     
-    // Add floating label effect
+    // Add floating label effect with Apple-style transitions
     inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            input.style.transition = 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        });
+        
         input.addEventListener('blur', () => {
             if (input.value) {
                 input.classList.add('has-value');
@@ -256,12 +311,18 @@ async function handleFormSubmission(e) {
     const formData = new FormData(form);
     const submitButton = form.querySelector('.form-submit');
     
-    // Show loading state
+    // Show loading state with Apple-style animation
     const originalText = submitButton.innerHTML;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
     submitButton.disabled = true;
+    submitButton.style.transform = 'scale(0.98)';
     
     try {
+        // Simulate Apple-style haptic feedback
+        if (navigator.vibrate) {
+            navigator.vibrate([10, 50, 10]);
+        }
+        
         // You can integrate with services like:
         // - Formspree (https://formspree.io/)
         // - Netlify Forms
@@ -280,61 +341,31 @@ async function handleFormSubmission(e) {
         if (response.ok) {
             showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
             form.reset();
+            
+            // Success haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate([10, 20, 30]);
+            }
         } else {
             throw new Error('Form submission failed');
         }
     } catch (error) {
         console.error('Form submission error:', error);
         showNotification('Sorry, there was an error sending your message. Please try again.', 'error');
+        
+        // Error haptic feedback
+        if (navigator.vibrate) {
+            navigator.vibrate([100, 50, 100]);
+        }
     } finally {
         // Reset button state
         submitButton.innerHTML = originalText;
         submitButton.disabled = false;
+        submitButton.style.transform = 'scale(1)';
     }
 }
 
-// Alternative form handlers for different services
-function initializeEmailJS() {
-    // EmailJS Integration Example
-    // First, include EmailJS SDK in your HTML:
-    // <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
-    /*
-    emailjs.init("YOUR_PUBLIC_KEY");
-    
-    const form = document.getElementById('contactForm');
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', this)
-            .then(function() {
-                showNotification('Message sent successfully!', 'success');
-                form.reset();
-            }, function(error) {
-                showNotification('Failed to send message. Please try again.', 'error');
-                console.log('FAILED...', error);
-            });
-    });
-    */
-}
-
-function initializeNetlifyForms() {
-    // For Netlify Forms, just add data-netlify="true" to your form tag
-    // The form will be automatically handled by Netlify
-    
-    const form = document.getElementById('contactForm');
-    form.setAttribute('data-netlify', 'true');
-    form.setAttribute('method', 'POST');
-    
-    // Add hidden input for Netlify
-    const hiddenInput = document.createElement('input');
-    hiddenInput.type = 'hidden';
-    hiddenInput.name = 'form-name';
-    hiddenInput.value = 'contact';
-    form.appendChild(hiddenInput);
-}
-
-// Notification System
+// Enhanced Notification System with Dark Theme
 function showNotification(message, type = 'info') {
     // Remove existing notifications
     const existingNotifications = document.querySelectorAll('.notification');
@@ -353,33 +384,37 @@ function showNotification(message, type = 'info') {
         </div>
     `;
     
-    // Add styles for notification
+    // Add styles for notification with dark theme
     const notificationStyles = `
         .notification {
             position: fixed;
             top: 100px;
             right: 20px;
-            min-width: 300px;
+            min-width: 320px;
             max-width: 500px;
-            padding: 1rem;
-            border-radius: 10px;
+            padding: 1.2rem;
+            border-radius: 16px;
             color: white;
             z-index: 10000;
             transform: translateX(100%);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
         }
         
         .notification-success {
-            background: linear-gradient(135deg, #28a745, #20c997);
+            background: rgba(30, 215, 96, 0.9);
         }
         
         .notification-error {
-            background: linear-gradient(135deg, #dc3545, #fd7e14);
+            background: rgba(255, 69, 58, 0.9);
         }
         
         .notification-info {
-            background: linear-gradient(135deg, #007bff, #6610f2);
+            background: rgba(247, 147, 30, 0.9);
         }
         
         .notification.show {
@@ -389,7 +424,7 @@ function showNotification(message, type = 'info') {
         .notification-content {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 1rem;
         }
         
         .notification-close {
@@ -398,13 +433,17 @@ function showNotification(message, type = 'info') {
             color: white;
             cursor: pointer;
             margin-left: auto;
-            padding: 0.2rem;
+            padding: 0.4rem;
             border-radius: 50%;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .notification-close:hover {
             background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
         }
     `;
     
@@ -429,11 +468,11 @@ function showNotification(message, type = 'info') {
         notification.style.transform = 'translateX(100%)';
         setTimeout(() => {
             notification.remove();
-        }, 300);
+        }, 400);
     }, 5000);
 }
 
-// Brand Modals
+// Enhanced Brand Modals with Dark Theme
 function initializeBrandModals() {
     const brandCards = document.querySelectorAll('.brand-card');
     const modal = document.getElementById('brandModal');
@@ -498,12 +537,21 @@ function showBrandModal(brand) {
     
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
+    
+    // Add entrance animation
+    setTimeout(() => {
+        modal.style.opacity = '1';
+    }, 10);
 }
 
 function closeBrandModal() {
     const modal = document.getElementById('brandModal');
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
+    modal.style.opacity = '0';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 300);
 }
 
 function getBrandIcon(brandTitle) {
@@ -520,13 +568,13 @@ function getBrandIcon(brandTitle) {
     return icons[brandTitle] || 'star';
 }
 
-// Parallax Effects
+// Enhanced Parallax Effects
 function initializeParallaxEffects() {
     const parallaxElements = document.querySelectorAll('.hero-particles');
     
     window.addEventListener('scroll', () => {
         const scrolled = window.pageYOffset;
-        const rate = scrolled * -0.5;
+        const rate = scrolled * -0.3; // Reduced for smoother effect
         
         parallaxElements.forEach(element => {
             element.style.transform = `translateY(${rate}px)`;
@@ -534,7 +582,7 @@ function initializeParallaxEffects() {
     });
 }
 
-// Smooth Scrolling
+// Apple-style Smooth Scrolling
 function initializeSmoothScrolling() {
     const scrollLinks = document.querySelectorAll('a[href^="#"]');
     
@@ -547,13 +595,36 @@ function initializeSmoothScrolling() {
             if (targetElement) {
                 const offsetTop = targetElement.offsetTop - 80; // Account for fixed navbar
                 
-                window.scrollTo({
-                    top: offsetTop,
-                    behavior: 'smooth'
-                });
+                // Custom smooth scroll with Apple-style easing
+                smoothScrollTo(offsetTop, 800);
             }
         });
     });
+}
+
+// Custom smooth scroll function with Apple easing
+function smoothScrollTo(targetPosition, duration) {
+    const startPosition = window.pageYOffset;
+    const distance = targetPosition - startPosition;
+    const startTime = performance.now();
+    
+    function scrollAnimation(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Apple-style easing
+        const easeInOutCubic = progress < 0.5 
+            ? 4 * progress * progress * progress 
+            : (progress - 1) * (2 * progress - 2) * (2 * progress - 2) + 1;
+        
+        window.scrollTo(0, startPosition + distance * easeInOutCubic);
+        
+        if (progress < 1) {
+            requestAnimationFrame(scrollAnimation);
+        }
+    }
+    
+    requestAnimationFrame(scrollAnimation);
 }
 
 // Global scroll function for buttons
@@ -561,32 +632,36 @@ function scrollToSection(sectionId) {
     const element = document.getElementById(sectionId);
     if (element) {
         const offsetTop = element.offsetTop - 80;
-        window.scrollTo({
-            top: offsetTop,
-            behavior: 'smooth'
-        });
+        smoothScrollTo(offsetTop, 800);
     }
 }
 
-// Scroll Event Handler
+// Enhanced Scroll Event Handler
 function handleScroll() {
     currentScrollY = window.scrollY;
     
-    // Update navbar appearance
+    // Update navbar appearance with enhanced glass effect
     const navbar = document.getElementById('navbar');
     if (currentScrollY > 50) {
         navbar.classList.add('scrolled');
+        navbar.style.background = 'rgba(0, 0, 0, 0.95)';
+        navbar.style.backdropFilter = 'blur(20px)';
+        navbar.style.webkitBackdropFilter = 'blur(20px)';
     } else {
         navbar.classList.remove('scrolled');
+        navbar.style.background = 'rgba(26, 26, 26, 0.8)';
     }
     
-    // Parallax effect for hero section
+    // Enhanced parallax effect for hero section
     if (currentScrollY < window.innerHeight) {
         const heroContent = document.querySelector('.hero-content');
         if (heroContent) {
             const scrollPercent = currentScrollY / window.innerHeight;
-            heroContent.style.transform = `translateY(${scrollPercent * 50}px)`;
-            heroContent.style.opacity = 1 - scrollPercent * 0.8;
+            const translateY = scrollPercent * 30; // Reduced for subtle effect
+            const opacity = 1 - (scrollPercent * 0.6);
+            
+            heroContent.style.transform = `translateY(${translateY}px)`;
+            heroContent.style.opacity = Math.max(opacity, 0.2);
         }
     }
 }
@@ -603,112 +678,64 @@ function handleResize() {
     }
 }
 
-// Intersection Observer for animations
-function createScrollObserver() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-    
-    // Observe elements that should animate on scroll
-    const elementsToAnimate = document.querySelectorAll(`
-        .section-title,
-        .business-card,
-        .brand-card,
-        .location-card,
-        .feature-item,
-        .contact-item
-    `);
-    
-    elementsToAnimate.forEach(element => {
-        observer.observe(element);
-    });
-}
-
-// Add CSS classes for scroll animations
-function addScrollAnimationStyles() {
-    const styles = `
-        .animate-in {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-        
-        .section-title,
-        .business-card,
-        .brand-card,
-        .location-card,
-        .feature-item,
-        .contact-item {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s ease-out;
-        }
-    `;
-    
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = styles;
-    document.head.appendChild(styleSheet);
-}
-
-// Brand modal styles
+// Enhanced Brand Modal Styles
 function addBrandModalStyles() {
     const styles = `
         .brand-modal-header {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid var(--light-gray);
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .brand-modal-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--gradient-primary);
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #F7931E, #E8830C);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 2rem;
+            font-size: 2.2rem;
+            box-shadow: 0 10px 30px rgba(247, 147, 30, 0.3);
         }
         
         .brand-modal-title h2 {
-            color: var(--deep-blue);
-            margin-bottom: 0.5rem;
+            color: #FFFFFF;
+            margin-bottom: 0.8rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
         }
         
         .brand-modal-category {
-            color: var(--primary-gold);
+            color: #F7931E;
             font-weight: 600;
+            font-size: 1rem;
         }
         
         .brand-modal-description {
             font-size: 1.1rem;
             line-height: 1.8;
-            margin-bottom: 2rem;
-            color: var(--text-dark);
+            margin-bottom: 2.5rem;
+            color: #B3B3B3;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
         }
         
         .brand-modal-features {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
         
         .brand-modal-features h3,
         .brand-modal-details h3 {
-            color: var(--deep-blue);
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
+            color: #FFFFFF;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            font-weight: 600;
         }
         
         .features-list {
@@ -719,21 +746,31 @@ function addBrandModalStyles() {
         .features-list li {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            margin-bottom: 0.8rem;
-            padding: 0.8rem;
-            background: var(--light-gray);
-            border-radius: 8px;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(26, 26, 26, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            color: #FFFFFF;
+        }
+        
+        .features-list li:hover {
+            background: rgba(45, 45, 45, 0.8);
+            border-color: #F7931E;
+            transform: translateX(5px);
         }
         
         .features-list li i {
-            color: var(--primary-gold);
-            font-size: 1rem;
+            color: #F7931E;
+            font-size: 1.1rem;
         }
         
         .brand-modal-details p {
             line-height: 1.8;
-            color: var(--text-dark);
+            color: #B3B3B3;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
         }
     `;
     
@@ -742,11 +779,40 @@ function addBrandModalStyles() {
     document.head.appendChild(styleSheet);
 }
 
+// Performance Monitoring
+function initializePerformanceMonitoring() {
+    // Monitor loading time
+    window.addEventListener('load', () => {
+        const loadTime = performance.now();
+        console.log(`🚀 Dark theme page loaded in ${loadTime.toFixed(2)}ms`);
+    });
+    
+    // Monitor scroll performance
+    let scrollStart = 0;
+    let scrollCount = 0;
+    
+    const throttledScrollMonitor = throttle(() => {
+        if (scrollStart === 0) {
+            scrollStart = performance.now();
+        }
+        scrollCount++;
+        
+        // Log performance every 50 scroll events
+        if (scrollCount % 50 === 0) {
+            const scrollTime = performance.now() - scrollStart;
+            console.log(`50 scroll events in ${scrollTime.toFixed(2)}ms`);
+            scrollStart = 0;
+            scrollCount = 0;
+        }
+    }, 16);
+    
+    window.addEventListener('scroll', throttledScrollMonitor);
+}
+
 // Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    addScrollAnimationStyles();
     addBrandModalStyles();
-    createScrollObserver();
+    initializePerformanceMonitoring();
 });
 
 // Utility Functions
@@ -779,117 +845,65 @@ function throttle(func, limit) {
 const optimizedScrollHandler = throttle(handleScroll, 16); // ~60fps
 window.addEventListener('scroll', optimizedScrollHandler);
 
-// Add smooth reveal animations for elements
-function revealOnScroll() {
-    const reveals = document.querySelectorAll('.reveal');
+// Apple-style Device Detection
+function detectAppleDevice() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isAppleDevice = /iPad|iPhone|iPod|Mac/.test(userAgent);
     
-    reveals.forEach(reveal => {
-        const windowHeight = window.innerHeight;
-        const elementTop = reveal.getBoundingClientRect().top;
-        const elementVisible = 150;
+    if (isAppleDevice) {
+        document.body.classList.add('apple-device');
         
-        if (elementTop < windowHeight - elementVisible) {
-            reveal.classList.add('active');
-        }
-    });
-}
-
-window.addEventListener('scroll', revealOnScroll);
-
-// Custom cursor effect (optional)
-function initializeCustomCursor() {
-    const cursor = document.createElement('div');
-    cursor.className = 'custom-cursor';
-    document.body.appendChild(cursor);
-    
-    let mouseX = 0;
-    let mouseY = 0;
-    let cursorX = 0;
-    let cursorY = 0;
-    
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
-    
-    function animateCursor() {
-        cursorX += (mouseX - cursorX) * 0.1;
-        cursorY += (mouseY - cursorY) * 0.1;
+        // Add Apple-specific enhancements
+        const appleStyles = `
+            .apple-device * {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+            
+            .apple-device button,
+            .apple-device .btn-primary,
+            .apple-device .btn-secondary {
+                -webkit-tap-highlight-color: transparent;
+            }
+        `;
         
-        cursor.style.left = cursorX + 'px';
-        cursor.style.top = cursorY + 'px';
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = appleStyles;
+        document.head.appendChild(styleSheet);
         
-        requestAnimationFrame(animateCursor);
+        console.log('🍎 Apple device detected - enhanced for optimal experience');
     }
     
-    animateCursor();
-    
-    // Add cursor styles
-    const cursorStyles = `
-        .custom-cursor {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--primary-gold);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            mix-blend-mode: difference;
-            transition: transform 0.1s ease;
-        }
-        
-        .custom-cursor.hover {
-            transform: scale(1.5);
-            background: var(--primary-gold);
-        }
-    `;
-    
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = cursorStyles;
-    document.head.appendChild(styleSheet);
-    
-    // Add hover effects
-    const hoverElements = document.querySelectorAll('a, button, .brand-card, .business-card');
-    hoverElements.forEach(element => {
-        element.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        element.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
+    return isAppleDevice;
 }
 
-// Initialize custom cursor (uncomment to enable)
-// initializeCustomCursor();
-
-// Performance monitoring
-function initializePerformanceMonitoring() {
-    // Monitor loading time
-    window.addEventListener('load', () => {
-        const loadTime = performance.now();
-        console.log(`Page loaded in ${loadTime.toFixed(2)}ms`);
-    });
-    
-    // Monitor scroll performance
-    let scrollStart = 0;
-    let scrollCount = 0;
-    
-    window.addEventListener('scroll', () => {
-        if (scrollStart === 0) {
-            scrollStart = performance.now();
-        }
-        scrollCount++;
-        
-        // Log performance every 100 scroll events
-        if (scrollCount % 100 === 0) {
-            const scrollTime = performance.now() - scrollStart;
-            console.log(`100 scroll events in ${scrollTime.toFixed(2)}ms`);
-            scrollStart = 0;
-            scrollCount = 0;
-        }
-    });
+// System Theme Detection
+function detectSystemTheme() {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        console.log('🌙 System dark mode detected - perfect match!');
+        return 'dark';
+    } else {
+        console.log('🌙 Forcing dark mode for optimal experience');
+        return 'dark'; // Always dark in our implementation
+    }
 }
 
-// Initialize performance monitoring in development
-// initializePerformanceMonitoring();
+// Initialize advanced features
+document.addEventListener('DOMContentLoaded', () => {
+    detectAppleDevice();
+    detectSystemTheme();
+});
 
 // Export functions for global use
 window.scrollToSection = scrollToSection;
 window.showNotification = showNotification;
+window.smoothScrollTo = smoothScrollTo;
+
+// Development helpers
+if (typeof process !== 'undefined' && process?.env?.NODE_ENV === 'development') {
+    window.debugTheme = () => {
+        console.log('Current theme: Dark');
+        console.log('Apple device:', detectAppleDevice());
+        console.log('Performance metrics available in console');
+    };
+}
